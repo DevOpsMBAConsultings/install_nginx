@@ -175,8 +175,19 @@ sleep 5
 # Request cert with Certbot; on success, save and backup
 # ------------------------------------------------------------
 CERTBOT_OK=0
+REACHABLE=0
+LOCALHOST_FALLBACK=0
 if curl -fsS --connect-timeout 5 "http://${DOMAIN}" >/dev/null; then
-  echo "Domain reachable over HTTP. Proceeding with Certbot..."
+  REACHABLE=1
+fi
+# If curl to domain timed out (e.g. hairpin NAT), check if Nginx answers locally
+if [[ "${REACHABLE}" -eq 0 ]] && curl -fsS --connect-timeout 2 -H "Host: ${DOMAIN}" "http://127.0.0.1/" >/dev/null; then
+  echo "Domain not reachable from this host (e.g. cloud NAT); Nginx answers locally. Proceeding with Certbot (Let's Encrypt will connect from the internet)..."
+  REACHABLE=1
+  LOCALHOST_FALLBACK=1
+fi
+if [[ "${REACHABLE}" -eq 1 ]]; then
+  [[ "${LOCALHOST_FALLBACK}" -eq 0 ]] && echo "Domain reachable over HTTP. Proceeding with Certbot..."
   if certbot --nginx \
     -d "${DOMAIN}" \
     -m "${LETSENCRYPT_EMAIL}" \

@@ -12,6 +12,7 @@ Use this when:
 - Odoo already running (e.g. on `127.0.0.1:8069`).
 - Domain pointing to this server (for Certbot).
 - Run as a user that can `sudo`.
+- **Port 80 and 443 open** in your **cloud firewall** (e.g. Oracle Cloud Security List, AWS Security Group, Azure NSG) so the server can receive HTTP/HTTPS from the internet. If you see “Failed to connect … port 80 … Timeout” or Certbot is skipped, open TCP 80 and 443 in the cloud console for this instance.
 
 ## How to run
 
@@ -89,3 +90,9 @@ sudo -E ./scripts/install_nginx_ssl.sh
 ```
 
 You must run `install_nginx_ssl.sh` from the project root (or set paths in the script); the script resolves `PROJECT_ROOT` as the parent of `scripts/`.
+
+## Troubleshooting
+
+- **“Could not resolve host”** – Use the full domain (e.g. `suplidora-jc.com`), not a short name like `suplidora-jc`.
+- **“Failed to connect … port 80 … Timeout” / Certbot skipped** – Open **TCP 80 and 443** in your cloud provider’s firewall (Security List, Security Group, or NSG) for this instance. The script will still try Certbot if Nginx answers locally (e.g. behind NAT).
+- **Nginx installed but no HTTPS** – Re-run the script with the correct domain and ensure port 80 is open from the internet so Let’s Encrypt can complete the challenge.
