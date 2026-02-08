@@ -13,27 +13,39 @@ Use this when:
 - Domain pointing to this server (for Certbot).
 - Run as a user that can `sudo`.
 
-## Quick start
+## How to run
 
-1. Clone or copy this project to the server (e.g. under `~/install_nginx`).
-2. Run the main script:
+1. **Get the project on the server** (clone or copy), e.g. under `~/install_nginx`:
 
    ```bash
+   git clone https://github.com/DevOpsMBAConsultings/install_nginx.git
    cd install_nginx
+   ```
+
+2. **Make the main script executable and run it:**
+
+   ```bash
    chmod +x install_nginx.sh
    ./install_nginx.sh
    ```
 
-3. When prompted, enter:
+3. **Answer the prompts** when asked:
    - **Domain name** (e.g. `erp.example.com`)
    - **Email** for Let's Encrypt
    - **Odoo port** (default `8069`)
-   - **Remote SSL storage**: `s3`, `url`, or `no`
+   - **Remote SSL storage**: `s3`, `url`, or `no` (and S3/URL details if needed)
 
-4. If you choose **s3** (e.g. Cloudflare R2):
-   - Bucket name
-   - S3 endpoint URL (for R2: `https://ACCOUNT_ID.r2.cloudflarestorage.com`)
-   - Access Key ID and Secret Access Key
+4. The script will install Nginx, obtain certificates (Certbot), and configure the reverse proxy. Certificates are stored under `/opt/odoo/ssl-store/<domain>/`.
+
+**One-liner** (after cloning):
+
+```bash
+cd install_nginx && chmod +x install_nginx.sh && ./install_nginx.sh
+```
+
+## Quick start
+
+See **How to run** above. In short: clone, `chmod +x install_nginx.sh`, run `./install_nginx.sh`, then answer the prompts. If you choose **s3** (e.g. Cloudflare R2), you’ll be asked for bucket name, S3 endpoint URL (for R2: `https://ACCOUNT_ID.r2.cloudflarestorage.com`), and Access Key ID / Secret Access Key.
 
 Certificates are stored locally under `/opt/odoo/ssl-store/<domain>/`. If you use S3/R2, the script will try to **restore** from `s3://<bucket>/odoo-ssl/<domain>/cert.tar.gz` and, after a new Certbot run, **backup** there so other servers can reuse the cert.
 
